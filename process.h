@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 
 #define PROCESS_NUMBER 5
 #define QUEUE_SIZE 100
@@ -22,13 +23,15 @@ typedef struct process_info {
 	int priority;
 } process_info;
 
-process_info process_list[PROCESS_NUMBER];
-int pl_num;
+void Config();
+
+extern process_info process_list[PROCESS_NUMBER];
+extern int pl_num;
 
 void Create_Process(const process_info*);
 
-process_info(*ready_queue)[QUEUE_SIZE];
-int rq_front, rq_rear;
+extern process_info(*ready_queue)[QUEUE_SIZE];
+extern int rq_front, rq_rear;
 
 void Push_Ready_Queue(const process_info*);
 
