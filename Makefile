@@ -4,7 +4,7 @@ CFLAGS = -Wall -g
 
 TARGET = simulator
 
-OBJS = main.o process.o scheduler.o
+OBJS = main.o process.o scheduler.o queue.o
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
