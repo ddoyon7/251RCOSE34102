@@ -5,33 +5,6 @@ int scheduling_idx;
 process_info* running_process;
 process_info scheduling_process_list[PROCESS_NUMBER];
 int gantt_chart[GANTT_SIZE];
-int (*cmp_list[3])(const void*, const void*) = { Cmp_FCFS, Cmp_SJF,Cmp_PR };
-
-int Cmp_FCFS(const void* p1, const void* p2) {
-	if (((process_info*)p1)->arrival_time > ((process_info*)p2)->arrival_time) return 1;
-	else if (((process_info*)p1)->arrival_time < ((process_info*)p2)->arrival_time) return -1;
-	return 0;
-}
-
-int Cmp_SJF(const void* p1, const void* p2) {
-	if (((process_info*)p1)->arrival_time > ((process_info*)p2)->arrival_time) return 1;
-	else if (((process_info*)p1)->arrival_time < ((process_info*)p2)->arrival_time) return -1;
-	else {
-		if (((process_info*)p1)->cpu_burst_time > ((process_info*)p2)->cpu_burst_time) return 1;
-		else if (((process_info*)p1)->cpu_burst_time < ((process_info*)p2)->cpu_burst_time) return -1;
-	}
-	return 0;
-}
-
-int Cmp_PR(const void* p1, const void* p2) {
-	if (((process_info*)p1)->arrival_time > ((process_info*)p2)->arrival_time) return 1;
-	else if (((process_info*)p1)->arrival_time < ((process_info*)p2)->arrival_time) return -1;
-	else {
-		if (((process_info*)p1)->priority < ((process_info*)p2)->priority) return 1;
-		else if (((process_info*)p1)->priority > ((process_info*)p2)->priority) return -1;
-	}
-	return 0;
-}
 
 void Init(int type) {
 	scheduling_time = 0;
@@ -43,7 +16,6 @@ void Init(int type) {
 		scheduling_process_list[i].cpu_burst_time = process_list[i].cpu_burst_time;
 		scheduling_process_list[i].priority = process_list[i].priority;
 	}
-	qsort(scheduling_process_list, PROCESS_NUMBER, sizeof(process_info), cmp_list[type]);
 }
 
 int Is_Finished() {
@@ -59,8 +31,8 @@ void FCFS() {
 	printf("< FCFS() start >\n");
 	Init(T_FCFS);
 	while (!Is_Finished()) {
-		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++]);
-		if (!Is_Empty_QUEUE() && running_process == NULL) running_process = Pop_Ready_Queue();
+		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_FCFS);
+		if (!Is_Empty_QUEUE() && running_process == NULL) running_process = Pop_Ready_Queue(T_FCFS);
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
 			(running_process->cpu_burst_time)--;
@@ -70,6 +42,23 @@ void FCFS() {
 	}
 	Show_Gantt(scheduling_time);
 	printf("< FCFS() end >\n");
+}
+
+void SJF() {
+	printf("< SJF() start >\n");
+	Init(T_SJF);
+	while (!Is_Finished()) {
+		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_SJF);
+		if (!Is_Empty_QUEUE() && running_process == NULL) running_process = Pop_Ready_Queue(T_SJF);
+		if (running_process) {
+			gantt_chart[scheduling_time] = running_process->pid;
+			(running_process->cpu_burst_time)--;
+			if (running_process->cpu_burst_time == 0) running_process = NULL;
+		}
+		scheduling_time++;
+	}
+	Show_Gantt(scheduling_time);
+	printf("< SJF() end >\n");
 }
 
 void Show_Gantt(int end_time) {
