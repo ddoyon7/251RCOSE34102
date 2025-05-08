@@ -25,7 +25,6 @@ void Config();
 extern process_info process_list[PROCESS_NUMBER];
 extern int pl_num;
 
-int cmp(const void*, const void*);
 void Create_Process();
 
 void Show_Process();

@@ -11,16 +11,6 @@ void Config() {
 	rq_front = rq_rear = -1;
 }
 
-int cmp(const void* p1, const void* p2) {
-	if (((process_info*)p1)->arrival_time > ((process_info*)p2)->arrival_time) return 1;
-	else if (((process_info*)p1)->arrival_time < ((process_info*)p2)->arrival_time) return -1;
-	else {
-		if (((process_info*)p1)->priority < ((process_info*)p2)->priority) return 1;
-		else if (((process_info*)p1)->priority > ((process_info*)p2)->priority) return -1;
-	}
-	return 0;
-}
-
 void Create_Process() {
 	srand(time(NULL));
 	for (int i = 0; i < PROCESS_NUMBER; i++) {
@@ -30,12 +20,11 @@ void Create_Process() {
 		process_list[pl_num].priority = rand() % MAX_PRIORITY + 1;
 		pl_num++;
 	}
-	qsort(process_list, pl_num, sizeof(process_info), cmp);
 }
 
 void Show_Process() {
 
-	printf("----------------------------< process >----------------------------\n");
+	printf("----------------------------< created process >--------------------\n");
 	for (int i = 0; i < pl_num; i++) printf("Process[%d] => ArrivalTime : %d, CpuBurstTime : %d, Priority : %d\n", process_list[i].pid, process_list[i].arrival_time, process_list[i].cpu_burst_time, process_list[i].priority);
 	printf("-------------------------------------------------------------------\n");
 }
