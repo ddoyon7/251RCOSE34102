@@ -9,7 +9,6 @@
 #define MAX_ARRIVALTIME 20
 #define MAX_CPUBURSTTIME 20
 #define MAX_PRIORITY 5
-#define QUEUE_SIZE 100
 
 typedef struct process_info {
 	int pid;
@@ -20,7 +19,7 @@ typedef struct process_info {
 	int priority;
 } process_info;
 
-void Config();
+
 
 extern process_info process_list[PROCESS_NUMBER];
 extern int pl_num;
@@ -28,19 +27,5 @@ extern int pl_num;
 void Create_Process();
 
 void Show_Process();
-
-extern process_info* ready_queue[QUEUE_SIZE];
-extern int rq_front, rq_rear;
-
-void Push_Ready_Queue(process_info*);
-
-process_info* Pop_Ready_Queue();
-
-int Is_Empty_QUEUE();
-
-int Is_Full_QUEUE();
-
-//process_info waiting_queue[QUEUE_SIZE];
-//int wq_front, wq_rear;
 
 #endif
