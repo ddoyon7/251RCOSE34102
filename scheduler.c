@@ -61,6 +61,23 @@ void SJF() {
 	printf("< SJF() end >\n");
 }
 
+void Priority() {
+	printf("< Priority() start >\n");
+	Init(T_SJF);
+	while (!Is_Finished()) {
+		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PR);
+		if (!Is_Empty_QUEUE() && running_process == NULL) running_process = Pop_Ready_Queue(T_PR);
+		if (running_process) {
+			gantt_chart[scheduling_time] = running_process->pid;
+			(running_process->cpu_burst_time)--;
+			if (running_process->cpu_burst_time == 0) running_process = NULL;
+		}
+		scheduling_time++;
+	}
+	Show_Gantt(scheduling_time);
+	printf("< Priority() end >\n");
+}
+
 void Show_Gantt(int end_time) {
 	int bar[GANTT_SIZE];
 	bar[0] = 1;
