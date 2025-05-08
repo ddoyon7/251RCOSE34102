@@ -3,7 +3,7 @@
 int main() {
 	Config();
 	Create_Process();
-	Set_Process();
 	Show_Process();
+	FCFS();
 	return 0;
 }
