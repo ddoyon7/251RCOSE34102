@@ -19,7 +19,7 @@ typedef struct process_info {
 	int priority;
 } process_info;
 
-
+int CMP(const void*, const void*);
 
 extern process_info process_list[PROCESS_NUMBER];
 extern int pl_num;

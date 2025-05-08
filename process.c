@@ -3,6 +3,13 @@
 process_info process_list[PROCESS_NUMBER];
 int pl_num;
 
+int CMP(const void* p1, const void* p2) {
+	if (((process_info*)p1)->arrival_time > ((process_info*)p2)->arrival_time) return 1;
+	else if (((process_info*)p1)->arrival_time < ((process_info*)p2)->arrival_time) return -1;
+	return 0;
+}
+
+
 void Create_Process() {
 	srand(time(NULL));
 	for (int i = 0; i < PROCESS_NUMBER; i++) {
@@ -12,6 +19,7 @@ void Create_Process() {
 		process_list[pl_num].priority = rand() % MAX_PRIORITY + 1;
 		pl_num++;
 	}
+	qsort(process_list, PROCESS_NUMBER, sizeof(process_info), CMP);
 }
 
 void Show_Process() {
