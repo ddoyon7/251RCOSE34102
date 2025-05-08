@@ -25,18 +25,21 @@ void Config();
 extern process_info process_list[PROCESS_NUMBER];
 extern int pl_num;
 
+int cmp(const void*, const void*);
 void Create_Process();
 
-int cmp(const void*, const void*);
-void Set_Process();
 void Show_Process();
 
-extern const process_info* ready_queue[QUEUE_SIZE];
+extern process_info* ready_queue[QUEUE_SIZE];
 extern int rq_front, rq_rear;
 
-void Push_Ready_Queue(const process_info*);
+void Push_Ready_Queue(process_info*);
 
-const process_info* Pop_Ready_Queue();
+process_info* Pop_Ready_Queue();
+
+int Is_Empty_QUEUE();
+
+int Is_Full_QUEUE();
 
 //process_info waiting_queue[QUEUE_SIZE];
 //int wq_front, wq_rear;
