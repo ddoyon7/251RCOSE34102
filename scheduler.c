@@ -5,8 +5,35 @@ int scheduling_idx;
 process_info* running_process;
 process_info scheduling_process_list[PROCESS_NUMBER];
 int gantt_chart[GANTT_SIZE];
+int (*cmp_list[3])(const void*, const void*) = { Cmp_FCFS, Cmp_SJF,Cmp_PR };
 
-void Init() {
+int Cmp_FCFS(const void* p1, const void* p2) {
+	if (((process_info*)p1)->arrival_time > ((process_info*)p2)->arrival_time) return 1;
+	else if (((process_info*)p1)->arrival_time < ((process_info*)p2)->arrival_time) return -1;
+	return 0;
+}
+
+int Cmp_SJF(const void* p1, const void* p2) {
+	if (((process_info*)p1)->arrival_time > ((process_info*)p2)->arrival_time) return 1;
+	else if (((process_info*)p1)->arrival_time < ((process_info*)p2)->arrival_time) return -1;
+	else {
+		if (((process_info*)p1)->cpu_burst_time > ((process_info*)p2)->cpu_burst_time) return 1;
+		else if (((process_info*)p1)->cpu_burst_time < ((process_info*)p2)->cpu_burst_time) return -1;
+	}
+	return 0;
+}
+
+int Cmp_PR(const void* p1, const void* p2) {
+	if (((process_info*)p1)->arrival_time > ((process_info*)p2)->arrival_time) return 1;
+	else if (((process_info*)p1)->arrival_time < ((process_info*)p2)->arrival_time) return -1;
+	else {
+		if (((process_info*)p1)->priority < ((process_info*)p2)->priority) return 1;
+		else if (((process_info*)p1)->priority > ((process_info*)p2)->priority) return -1;
+	}
+	return 0;
+}
+
+void Init(int type) {
 	scheduling_time = 0;
 	scheduling_idx = 0;
 	running_process = NULL;
@@ -16,6 +43,7 @@ void Init() {
 		scheduling_process_list[i].cpu_burst_time = process_list[i].cpu_burst_time;
 		scheduling_process_list[i].priority = process_list[i].priority;
 	}
+	qsort(scheduling_process_list, PROCESS_NUMBER, sizeof(process_info), cmp_list[type]);
 }
 
 int Is_Finished() {
@@ -29,7 +57,7 @@ int Is_Arrived() {
 
 void FCFS() {
 	printf("< FCFS() start >\n");
-	Init();
+	Init(T_FCFS);
 	while (!Is_Finished()) {
 		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++]);
 		if (!Is_Empty_QUEUE() && running_process == NULL) running_process = Pop_Ready_Queue();
