@@ -1,21 +1,18 @@
-#ifndef  __PROCESS_H__
+#ifndef __PROCESS_H__
 #define __PROCESS_H__
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <time.h>
 
 #define PROCESS_NUMBER 5
-#define QUEUE_SIZE 100
 #define MAX_PID 32768
-#define MAX_ARRIVALTIME 10
-#define MAX_CPUBURSTTIME 10
+#define MAX_ARRIVALTIME 20
+#define MAX_CPUBURSTTIME 20
 #define MAX_PRIORITY 5
+#define QUEUE_SIZE 100
 
 typedef struct process_info {
-	pid_t pid;
+	int pid;
 	int arrival_time;
 	int cpu_burst_time;
 	//int io_burst_time;
@@ -28,12 +25,18 @@ void Config();
 extern process_info process_list[PROCESS_NUMBER];
 extern int pl_num;
 
-void Create_Process(const process_info*);
+void Create_Process();
 
-extern process_info(*ready_queue)[QUEUE_SIZE];
+int cmp(const void*, const void*);
+void Set_Process();
+void Show_Process();
+
+extern const process_info* ready_queue[QUEUE_SIZE];
 extern int rq_front, rq_rear;
 
 void Push_Ready_Queue(const process_info*);
+
+const process_info* Pop_Ready_Queue();
 
 //process_info waiting_queue[QUEUE_SIZE];
 //int wq_front, wq_rear;
