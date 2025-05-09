@@ -9,13 +9,16 @@
 #define MAX_ARRIVALTIME 20
 #define MAX_CPUBURSTTIME 20
 #define MAX_PRIORITY 5
+#define MAX_IOBURSTTIME 5
+#define IOREQUEST_NUMBER 3
+#define MAX_IOREQUESTTIME 50
 
 typedef struct process_info {
 	int pid;
 	int arrival_time;
 	int cpu_burst_time;
-	//int io_burst_time;
-	//int io_request_time;
+	int io_burst_time;
+	int io_request_time[IOREQUEST_NUMBER];
 	int priority;
 } process_info;
 

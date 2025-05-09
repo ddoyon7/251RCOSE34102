@@ -16,15 +16,17 @@ void Create_Process() {
 		process_list[pl_num].arrival_time = rand() % (MAX_ARRIVALTIME + 1);
 		process_list[pl_num].cpu_burst_time = rand() % MAX_CPUBURSTTIME + 1;
 		process_list[pl_num].priority = rand() % MAX_PRIORITY + 1;
+		process_list[pl_num].io_burst_time = rand() % MAX_IOBURSTTIME + 1;
+		for (int j = 0; j < IOREQUEST_NUMBER; j++) process_list[pl_num].io_request_time[j] = rand() % (MAX_IOREQUESTTIME + 1);
 		pl_num++;
 	}
 	qsort(process_list, PROCESS_NUMBER, sizeof(process_info), CMP);
 }
 
 void Show_Process() {
-	printf("----------------------------< created process >--------------------\n");
-	for (int i = 0; i < pl_num; i++) printf("Process %5d | ArrivalTime : %2d, CpuBurstTime : %2d, Priority : %2d\n", process_list[i].pid, process_list[i].arrival_time, process_list[i].cpu_burst_time, process_list[i].priority);
-	printf("-------------------------------------------------------------------\n");
+	printf("---------------------------------------------------< created process >-------------------------------------------\n");
+	for (int i = 0; i < pl_num; i++) printf("Process %5d | ArrivalTime : %2d, CpuBurstTime : %2d, Priority : %2d, IoBurstTime : %2d, IoRequestTime : %2d, %2d, %2d\n", process_list[i].pid, process_list[i].arrival_time, process_list[i].cpu_burst_time, process_list[i].priority, process_list[i].io_burst_time, process_list[i].io_request_time[0], process_list[i].io_request_time[1], process_list[i].io_request_time[2]);
+	printf("-----------------------------------------------------------------------------------------------------------------\n");
 }
 
 int Get_Process_Idx(int pid) {
