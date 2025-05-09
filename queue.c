@@ -39,6 +39,10 @@ int Is_Full_QUEUE() {
 	return rq_num == QUEUE_SIZE;
 }
 
+process_info* Get_Front_Ready_Queue() {
+	return ready_queue[0];
+}
+
 void Heapify_Up(int idx, int type) {
 	if (idx == 0) return;
 	int parent = (rq_num - 1) / 2;

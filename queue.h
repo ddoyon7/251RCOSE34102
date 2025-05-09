@@ -18,6 +18,8 @@ int Is_Empty_QUEUE();
 
 int Is_Full_QUEUE();
 
+process_info* Get_Front_Ready_Queue();
+
 void Heapify_Up(int, int);
 
 void Heapify_Down(int, int);
