@@ -33,7 +33,7 @@ void FCFS() {
 	Init();
 	while (!Is_Finished()) {
 		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_FCFS);
-		if (!Is_Empty_QUEUE() && running_process == NULL) running_process = Pop_Ready_Queue(T_FCFS);
+		if (!Is_Empty_Ready_Queue() && running_process == NULL) running_process = Pop_Ready_Queue(T_FCFS);
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
 			(running_process->cpu_burst_time)--;
@@ -51,7 +51,7 @@ void SJF() {
 	Init();
 	while (!Is_Finished()) {
 		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_SJF);
-		if (!Is_Empty_QUEUE() && running_process == NULL) running_process = Pop_Ready_Queue(T_SJF);
+		if (!Is_Empty_Ready_Queue() && running_process == NULL) running_process = Pop_Ready_Queue(T_SJF);
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
 			(running_process->cpu_burst_time)--;
@@ -69,7 +69,7 @@ void Priority() {
 	Init();
 	while (!Is_Finished()) {
 		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PR);
-		if (!Is_Empty_QUEUE() && running_process == NULL) running_process = Pop_Ready_Queue(T_PR);
+		if (!Is_Empty_Ready_Queue() && running_process == NULL) running_process = Pop_Ready_Queue(T_PR);
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
 			(running_process->cpu_burst_time)--;
@@ -88,7 +88,7 @@ void RR() {
 	int time_count = TIME_QUANTUM;
 	while (!Is_Finished()) {
 		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_RR);
-		if (!Is_Empty_QUEUE() && running_process == NULL) {
+		if (!Is_Empty_Ready_Queue() && running_process == NULL) {
 			running_process = Pop_Ready_Queue(T_RR);
 			time_count = TIME_QUANTUM;
 		}
@@ -113,7 +113,7 @@ void Preemptive_SJF() {
 	Init();
 	while (!Is_Finished()) {
 		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PSJF);
-		if (!Is_Empty_QUEUE()) {
+		if (!Is_Empty_Ready_Queue()) {
 			if (running_process == NULL) running_process = Pop_Ready_Queue(T_PSJF);
 			else if (running_process != NULL && Get_Front_Ready_Queue()->cpu_burst_time < running_process->cpu_burst_time) {
 				Push_Ready_Queue(running_process, T_PSJF);
@@ -137,7 +137,7 @@ void Preemptive_Priority() {
 	Init();
 	while (!Is_Finished()) {
 		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PPR);
-		if (!Is_Empty_QUEUE()) {
+		if (!Is_Empty_Ready_Queue()) {
 			if (running_process == NULL) running_process = Pop_Ready_Queue(T_PPR);
 			else if (running_process != NULL && Get_Front_Ready_Queue()->priority < running_process->priority) {
 				Push_Ready_Queue(running_process, T_PPR);

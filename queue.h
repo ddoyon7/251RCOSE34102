@@ -8,15 +8,18 @@ enum SCHEDULE_TYPE { T_FCFS, T_SJF, T_PR, T_RR, T_PSJF, T_PPR };
 extern process_info* ready_queue[QUEUE_SIZE];
 extern int rq_num;
 
+extern process_info* waiting_queue[QUEUE_SIZE];
+extern int wq_front, wq_rear;
+
 //void Config();
 
 void Push_Ready_Queue(process_info*, int);
 
 process_info* Pop_Ready_Queue(int);
 
-int Is_Empty_QUEUE();
+int Is_Empty_Ready_Queue();
 
-int Is_Full_QUEUE();
+int Is_Full_Ready_Queue();
 
 process_info* Get_Front_Ready_Queue();
 
@@ -25,6 +28,14 @@ void Heapify_Up(int, int);
 void Heapify_Down(int, int);
 
 void Swap_ReadyQueue(int, int);
-//process_info waiting_queue[QUEUE_SIZE];
-//int wq_front, wq_rear;
+
+int Is_Empty_Waiting_Queue();
+
+int Is_Full_Waiting_Queue();
+
+void Push_Waiting_Queue(process_info*);
+
+process_info* Pop_Waiting_Queue();
+
+process_info* Get_Front_Waiting_Queue();
 #endif
