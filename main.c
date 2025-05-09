@@ -11,5 +11,7 @@ int main() {
 	Priority();
 	printf("\n\n");
 	RR();
+	printf("\n\n");
+	Preemptive_SJF();
 	return 0;
 }
