@@ -7,7 +7,7 @@ void Push_Ready_Queue(process_info* pi, int type) {
 	if (Is_Full_QUEUE()) printf("ERR_QUEUE IS FULL\n");
 	else {
 		ready_queue[rq_num] = pi;
-		if (type == T_SJF || type == T_PR) Heapify_Up(rq_num, type);
+		if (type == T_SJF || type == T_PR || type == T_PSJF || type == T_PPR) Heapify_Up(rq_num, type);
 		rq_num++;
 	}
 }
@@ -19,9 +19,9 @@ process_info* Pop_Ready_Queue(int type) {
 	}
 	else {
 		process_info* res = ready_queue[0];
-		if (type == T_FCFS || type == T_SJF || type == T_PR) {
+		if (type == T_FCFS || type == T_SJF || type == T_PR || type == T_PSJF || type == T_PPR) {
 			ready_queue[0] = ready_queue[--rq_num];
-			Heapify_Up(rq_num, type);Heapify_Down(0, type);
+			Heapify_Down(0, type);
 		}
 		else if (type == T_RR) {
 			for (int i = 1; i < rq_num; i++) ready_queue[i - 1] = ready_queue[i];
@@ -49,6 +49,7 @@ void Heapify_Up(int idx, int type) {
 
 	switch (type) {
 	case T_SJF:
+	case T_PSJF:
 		if (ready_queue[parent]->cpu_burst_time > ready_queue[idx]->cpu_burst_time) {
 			Swap_ReadyQueue(parent, idx);
 			Heapify_Up(parent, type);
@@ -56,6 +57,7 @@ void Heapify_Up(int idx, int type) {
 		break;
 
 	case T_PR:
+	case T_PPR:
 		if (ready_queue[parent]->priority > ready_queue[idx]->priority) { // 낮을수록 우선순위가 높다.
 			Swap_ReadyQueue(parent, idx);
 			Heapify_Up(parent, type);
@@ -81,6 +83,7 @@ void Heapify_Down(int idx, int type) {
 		break;
 
 	case T_SJF:
+	case T_PSJF:
 		if (left < rq_num && ready_queue[left]->cpu_burst_time < ready_queue[target]->cpu_burst_time)
 			target = left;
 		if (left < rq_num && ready_queue[right]->cpu_burst_time < ready_queue[target]->cpu_burst_time)
@@ -88,6 +91,7 @@ void Heapify_Down(int idx, int type) {
 		break;
 
 	case T_PR:
+	case T_PPR:
 		if (left < rq_num && ready_queue[left]->priority < ready_queue[target]->priority)
 			target = left;
 		if (left < rq_num && ready_queue[right]->priority < ready_queue[target]->priority)
