@@ -5,6 +5,7 @@ int scheduling_idx;
 process_info* running_process;
 process_info scheduling_process_list[PROCESS_NUMBER];
 int gantt_chart[GANTT_SIZE];
+double evaluation_list[6][2];
 
 void Init() {
 	scheduling_time = 0;
@@ -41,7 +42,8 @@ void FCFS() {
 		scheduling_time++;
 	}
 	Show_Gantt(scheduling_time);
-	printf("< FCFS() end >\n");
+	printf("< FCFS() end >\n\n");
+	Compute_Time(scheduling_time, T_FCFS);
 }
 
 void SJF() {
@@ -58,7 +60,8 @@ void SJF() {
 		scheduling_time++;
 	}
 	Show_Gantt(scheduling_time);
-	printf("< SJF() end >\n");
+	printf("< SJF() end >\n\n");
+	Compute_Time(scheduling_time, T_SJF);
 }
 
 void Priority() {
@@ -75,7 +78,8 @@ void Priority() {
 		scheduling_time++;
 	}
 	Show_Gantt(scheduling_time);
-	printf("< Priority() end >\n");
+	printf("< Priority() end >\n\n");
+	Compute_Time(scheduling_time, T_PR);
 }
 
 void RR() {
@@ -100,19 +104,20 @@ void RR() {
 		scheduling_time++;
 	}
 	Show_Gantt(scheduling_time);
-	printf("< RR() end >\n");
+	printf("< RR() end >\n\n");
+	Compute_Time(scheduling_time, T_RR);
 }
 
 void Preemptive_SJF() {
 	printf("< Preemptive_SJF() start >\n");
 	Init();
 	while (!Is_Finished()) {
-		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_SJF);
+		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PSJF);
 		if (!Is_Empty_QUEUE()) {
-			if (running_process == NULL) running_process = Pop_Ready_Queue(T_SJF);
+			if (running_process == NULL) running_process = Pop_Ready_Queue(T_PSJF);
 			else if (running_process != NULL && Get_Front_Ready_Queue()->cpu_burst_time < running_process->cpu_burst_time) {
-				Push_Ready_Queue(running_process, T_SJF);
-				running_process = Pop_Ready_Queue(T_SJF);
+				Push_Ready_Queue(running_process, T_PSJF);
+				running_process = Pop_Ready_Queue(T_PSJF);
 			}
 		}
 		if (running_process) {
@@ -123,19 +128,20 @@ void Preemptive_SJF() {
 		scheduling_time++;
 	}
 	Show_Gantt(scheduling_time);
-	printf("< Preemptive_SJF() end >\n");
+	printf("< Preemptive_SJF() end >\n\n");
+	Compute_Time(scheduling_time, T_PSJF);
 }
 
 void Preemptive_Priority() {
 	printf("< Preemptive_Priority() start >\n");
 	Init();
 	while (!Is_Finished()) {
-		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PR);
+		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PPR);
 		if (!Is_Empty_QUEUE()) {
-			if (running_process == NULL) running_process = Pop_Ready_Queue(T_PR);
-			else if (running_process != NULL && Get_Front_Ready_Queue()->cpu_burst_time < running_process->cpu_burst_time) {
-				Push_Ready_Queue(running_process, T_PR);
-				running_process = Pop_Ready_Queue(T_PR);
+			if (running_process == NULL) running_process = Pop_Ready_Queue(T_PPR);
+			else if (running_process != NULL && Get_Front_Ready_Queue()->priority < running_process->priority) {
+				Push_Ready_Queue(running_process, T_PPR);
+				running_process = Pop_Ready_Queue(T_PPR);
 			}
 		}
 		if (running_process) {
@@ -146,21 +152,62 @@ void Preemptive_Priority() {
 		scheduling_time++;
 	}
 	Show_Gantt(scheduling_time);
-	printf("< Preemptive_Priority() end >\n");
+	printf("< Preemptive_Priority() end >\n\n");
+	Compute_Time(scheduling_time, T_PPR);
 }
 
 void Show_Gantt(int end_time) {
 	int bar[GANTT_SIZE];
 	bar[0] = 1;
-	for (int i = 1; i <= end_time; i++) {
-		bar[i] = 0;
-		if (gantt_chart[i] != gantt_chart[i - 1]) bar[i] = 1;
+	for (int t = 1; t <= end_time; t++) {
+		bar[t] = 0;
+		if (gantt_chart[t] != gantt_chart[t - 1]) bar[t] = 1;
 	}
 	printf("------ 0\n");
-	for (int i = 1; i <= end_time; i++) {
-		if (bar[i]) {
-			if (i != 0 && gantt_chart[i - 1]) printf("%6d\n", gantt_chart[i - 1]);
-			printf("------ %d\n", i);
+	for (int t = 1; t <= end_time; t++) {
+		if (bar[t]) {
+			if (t != 0 && gantt_chart[t - 1]) printf("%6d\n", gantt_chart[t - 1]);
+			printf("------ %d\n", t);
 		}
+	}
+}
+
+void Compute_Time(int end_time, int type) {
+	int waitingtime[PROCESS_NUMBER], turnaroundtime[PROCESS_NUMBER], completetime[PROCESS_NUMBER];
+	for (int i = 0; i < PROCESS_NUMBER; i++) waitingtime[i] = turnaroundtime[i] = -process_list[i].arrival_time;
+	for (int t = 0; t < end_time; t++) {
+		if (gantt_chart[t] != gantt_chart[t + 1]) {
+			if (gantt_chart[t]) {
+				int idx = Get_Process_Idx(gantt_chart[t]);
+				waitingtime[idx] -= t + 1;
+				completetime[idx] = t + 1;
+			}
+			if (gantt_chart[t + 1]) {
+				int idx = Get_Process_Idx(gantt_chart[t + 1]);
+				waitingtime[idx] += t + 1;
+			}
+		}
+	}
+	printf("< WaitingTime, TurnaroundTime >\n");
+	double aw = 0.0, at = 0.0;
+	for (int i = 0; i < PROCESS_NUMBER; i++) {
+		waitingtime[i] += completetime[i];
+		turnaroundtime[i] += completetime[i];
+		aw += waitingtime[i];
+		at += turnaroundtime[i];
+		printf("Process %5d | waitingtime : %3d, turnaroundtime : %3d\n", process_list[i].pid, waitingtime[i], turnaroundtime[i]);
+	}
+	printf("average waitingtime : %5.2lf\naverage turnaroundtime : %5.2lf\n", aw / PROCESS_NUMBER, at / PROCESS_NUMBER);
+	evaluation_list[type][0] = aw / PROCESS_NUMBER;
+	evaluation_list[type][1] = at / PROCESS_NUMBER;
+}
+
+void Evaluation() {
+	printf("< Evaluation >\n");
+	char scheduling_name[6][20] = { "FCFS","SJF","Priority","RoundRobin", "Preemptive SJF", "Preemptive Priority" };
+	for (int i = 0; i < 6; i++) {
+		printf("%20s | ", scheduling_name[i]);
+		if (evaluation_list[i][1] != 0) printf("average waitingtime : %5.2lf, average turnaroundtime : %5.2lf\n", evaluation_list[i][0], evaluation_list[i][1]);
+		else printf("Not scheduled\n");
 	}
 }

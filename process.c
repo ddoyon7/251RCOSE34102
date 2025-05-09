@@ -23,7 +23,7 @@ void Create_Process() {
 
 void Show_Process() {
 	printf("----------------------------< created process >--------------------\n");
-	for (int i = 0; i < pl_num; i++) printf("Process[%d] => ArrivalTime : %d, CpuBurstTime : %d, Priority : %d\n", process_list[i].pid, process_list[i].arrival_time, process_list[i].cpu_burst_time, process_list[i].priority);
+	for (int i = 0; i < pl_num; i++) printf("Process %5d | ArrivalTime : %2d, CpuBurstTime : %2d, Priority : %2d\n", process_list[i].pid, process_list[i].arrival_time, process_list[i].cpu_burst_time, process_list[i].priority);
 	printf("-------------------------------------------------------------------\n");
 }
 
