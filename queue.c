@@ -7,7 +7,7 @@ void Push_Ready_Queue(process_info* pi, int type) {
 	if (Is_Full_QUEUE()) printf("ERR_QUEUE IS FULL\n");
 	else {
 		ready_queue[rq_num] = pi;
-		Heapify_Up(rq_num, type);
+		if (type == T_SJF || type == T_PR) Heapify_Up(rq_num, type);
 		rq_num++;
 	}
 }
@@ -19,8 +19,14 @@ process_info* Pop_Ready_Queue(int type) {
 	}
 	else {
 		process_info* res = ready_queue[0];
-		ready_queue[0] = ready_queue[--rq_num];
-		Heapify_Down(0, type);
+		if (type == T_FCFS || type == T_SJF || type == T_PR) {
+			ready_queue[0] = ready_queue[--rq_num];
+			Heapify_Up(rq_num, type);Heapify_Down(0, type);
+		}
+		else if (type == T_RR) {
+			for (int i = 1; i < rq_num; i++) ready_queue[i - 1] = ready_queue[i];
+			rq_num--;
+		}
 		return res;
 	}
 }
