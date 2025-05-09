@@ -6,11 +6,14 @@ process_info* running_process;
 process_info scheduling_process_list[PROCESS_NUMBER];
 int gantt_chart[GANTT_SIZE];
 double evaluation_list[6][2];
+log log_list[100];
+int log_num;
 
 void Init() {
 	scheduling_time = 0;
 	scheduling_idx = 0;
 	running_process = NULL;
+	log_num = 0;
 	for (int i = 0; i < PROCESS_NUMBER; i++) {
 		scheduling_process_list[i].pid = process_list[i].pid;
 		scheduling_process_list[i].arrival_time = process_list[i].arrival_time;
@@ -19,6 +22,27 @@ void Init() {
 		scheduling_process_list[i].io_burst_time = process_list[i].io_burst_time;
 		for (int j = 0; j < IOREQUEST_NUMBER; j++) scheduling_process_list[i].io_request_time[j] = process_list[i].io_request_time[j];
 	}
+}
+
+void Add_Log(int pid, int time, int type) {
+	switch (type)
+	{
+	case 1: //Arrived
+		sprintf(log_list[log_num].text, "(Process %d Arrived) ", pid);
+		break;
+	case 2:  //Io requested
+		sprintf(log_list[log_num].text, "(Process %d Io Requested) ", pid);
+		break;
+	case 3: //Io finished
+		sprintf(log_list[log_num].text, "(Process %d Io finished) ", pid);
+		break;
+	}
+	log_list[log_num].time = time;
+	log_num++;
+} // preemption 추가
+
+log* Get_Front_Log() {
+	return &log_list[0];
 }
 
 int Is_Finished() {
@@ -39,9 +63,13 @@ void FCFS() {
 	printf("< FCFS() start >\n");
 	Init();
 	while (!Is_Finished()) {
-		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_FCFS);
+		while (Is_Arrived()) {
+			Add_Log(scheduling_process_list[scheduling_idx].pid, scheduling_time, 1);
+			Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_FCFS);
+		}
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) running_process = Pop_Ready_Queue(T_FCFS);
 		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Add_Log(running_process->pid, scheduling_time, 2);
 			Push_Waiting_Queue(running_process);
 			running_process = NULL;
 			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_FCFS);
@@ -57,7 +85,7 @@ void FCFS() {
 			if (pptr->io_burst_time == 0) {
 				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
 				Push_Ready_Queue(Pop_Waiting_Queue(), T_FCFS);
-				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+				Add_Log(pptr->pid, scheduling_time + 1, 3);
 			}
 		}
 		scheduling_time++;
@@ -71,12 +99,17 @@ void SJF() {
 	printf("< SJF() start >\n");
 	Init();
 	while (!Is_Finished()) {
-		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_SJF);
+		while (Is_Arrived()) {
+			Add_Log(scheduling_process_list[scheduling_idx].pid, scheduling_time, 1);
+			Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_SJF);
+		}
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) running_process = Pop_Ready_Queue(T_SJF);
 		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Add_Log(running_process->pid, scheduling_time, 2);
 			Push_Waiting_Queue(running_process);
 			running_process = NULL;
 			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_SJF);
+
 		}
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
@@ -89,7 +122,7 @@ void SJF() {
 			if (pptr->io_burst_time == 0) {
 				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
 				Push_Ready_Queue(Pop_Waiting_Queue(), T_SJF);
-				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+				Add_Log(pptr->pid, scheduling_time + 1, 3);
 			}
 		}
 		scheduling_time++;
@@ -103,9 +136,13 @@ void Priority() {
 	printf("< Priority() start >\n");
 	Init();
 	while (!Is_Finished()) {
-		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PR);
+		while (Is_Arrived()) {
+			Add_Log(scheduling_process_list[scheduling_idx].pid, scheduling_time, 1);
+			Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PR);
+		}
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) running_process = Pop_Ready_Queue(T_PR);
 		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Add_Log(running_process->pid, scheduling_time, 2);
 			Push_Waiting_Queue(running_process);
 			running_process = NULL;
 			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_PR);
@@ -121,7 +158,7 @@ void Priority() {
 			if (pptr->io_burst_time == 0) {
 				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
 				Push_Ready_Queue(Pop_Waiting_Queue(), T_PR);
-				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+				Add_Log(pptr->pid, scheduling_time + 1, 3);
 			}
 		}
 		scheduling_time++;
@@ -136,12 +173,16 @@ void RR() {
 	Init();
 	int time_count = TIME_QUANTUM;
 	while (!Is_Finished()) {
-		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_RR);
+		while (Is_Arrived()) {
+			Add_Log(scheduling_process_list[scheduling_idx].pid, scheduling_time, 1);
+			Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_RR);
+		}
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) {
 			running_process = Pop_Ready_Queue(T_RR);
 			time_count = TIME_QUANTUM;
 		}
 		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Add_Log(running_process->pid, scheduling_time, 2);
 			Push_Waiting_Queue(running_process);
 			running_process = NULL;
 			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_RR);
@@ -161,7 +202,7 @@ void RR() {
 			if (pptr->io_burst_time == 0) {
 				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
 				Push_Ready_Queue(Pop_Waiting_Queue(), T_RR);
-				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+				Add_Log(pptr->pid, scheduling_time + 1, 3);
 			}
 		}
 		scheduling_time++;
@@ -175,7 +216,10 @@ void Preemptive_SJF() {
 	printf("< Preemptive_SJF() start >\n");
 	Init();
 	while (!Is_Finished()) {
-		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PSJF);
+		while (Is_Arrived()) {
+			Add_Log(scheduling_process_list[scheduling_idx].pid, scheduling_time, 1);
+			Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PSJF);
+		}
 		if (!Is_Empty_Ready_Queue()) {
 			if (running_process == NULL) running_process = Pop_Ready_Queue(T_PSJF);
 			else if (running_process != NULL && Get_Front_Ready_Queue()->cpu_burst_time < running_process->cpu_burst_time) {
@@ -184,6 +228,7 @@ void Preemptive_SJF() {
 			}
 		}
 		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Add_Log(running_process->pid, scheduling_time, 2);
 			Push_Waiting_Queue(running_process);
 			running_process = NULL;
 			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_PSJF);
@@ -199,7 +244,7 @@ void Preemptive_SJF() {
 			if (pptr->io_burst_time == 0) {
 				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
 				Push_Ready_Queue(Pop_Waiting_Queue(), T_PSJF);
-				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+				Add_Log(pptr->pid, scheduling_time + 1, 3);
 			}
 		}
 		scheduling_time++;
@@ -213,7 +258,10 @@ void Preemptive_Priority() {
 	printf("< Preemptive_Priority() start >\n");
 	Init();
 	while (!Is_Finished()) {
-		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PPR);
+		while (Is_Arrived()) {
+			Add_Log(scheduling_process_list[scheduling_idx].pid, scheduling_time, 1);
+			Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PPR);
+		}
 		if (!Is_Empty_Ready_Queue()) {
 			if (running_process == NULL) running_process = Pop_Ready_Queue(T_PPR);
 			else if (running_process != NULL && Get_Front_Ready_Queue()->priority < running_process->priority) {
@@ -222,6 +270,7 @@ void Preemptive_Priority() {
 			}
 		}
 		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Add_Log(running_process->pid, scheduling_time, 2);
 			Push_Waiting_Queue(running_process);
 			running_process = NULL;
 			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_PPR);
@@ -237,7 +286,7 @@ void Preemptive_Priority() {
 			if (pptr->io_burst_time == 0) {
 				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
 				Push_Ready_Queue(Pop_Waiting_Queue(), T_PPR);
-				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+				Add_Log(pptr->pid, scheduling_time + 1, 3);
 			}
 		}
 		scheduling_time++;
@@ -249,16 +298,29 @@ void Preemptive_Priority() {
 
 void Show_Gantt(int end_time) {
 	int bar[GANTT_SIZE];
+	int log_ptr = 0;
 	bar[0] = 1;
 	for (int t = 1; t <= end_time; t++) {
 		bar[t] = 0;
 		if (gantt_chart[t] != gantt_chart[t - 1]) bar[t] = 1;
 	}
-	printf("------ 0\n");
-	for (int t = 1; t <= end_time; t++) {
+	for (int t = 0; t <= end_time; t++) {
 		if (bar[t]) {
 			if (t != 0 && gantt_chart[t - 1]) printf("%6d\n", gantt_chart[t - 1]);
-			printf("------ %d\n", t);
+			printf("------ %d ", t);
+			while (log_list[log_ptr].time == t) {
+				printf("%s", log_list[log_ptr].text);
+				log_ptr++;
+			}
+			printf("\n");
+		}
+		else if (log_list[log_ptr].time == t) {
+			printf("       %d ", t);
+			while (log_list[log_ptr].time == t) {
+				printf("%s", log_list[log_ptr].text);
+				log_ptr++;
+			}
+			printf("\n");
 		}
 	}
 }
