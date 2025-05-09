@@ -9,7 +9,6 @@ int CMP(const void* p1, const void* p2) {
 	return 0;
 }
 
-
 void Create_Process() {
 	srand(time(NULL));
 	for (int i = 0; i < PROCESS_NUMBER; i++) {
@@ -23,8 +22,12 @@ void Create_Process() {
 }
 
 void Show_Process() {
-
 	printf("----------------------------< created process >--------------------\n");
 	for (int i = 0; i < pl_num; i++) printf("Process[%d] => ArrivalTime : %d, CpuBurstTime : %d, Priority : %d\n", process_list[i].pid, process_list[i].arrival_time, process_list[i].cpu_burst_time, process_list[i].priority);
 	printf("-------------------------------------------------------------------\n");
+}
+
+int Get_Process_Idx(int pid) {
+	for (int i = 0; i < PROCESS_NUMBER; i++) if (process_list[i].pid == pid) return i;
+	return 0;
 }

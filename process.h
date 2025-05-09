@@ -28,4 +28,6 @@ void Create_Process();
 
 void Show_Process();
 
+int Get_Process_Idx(int);
+
 #endif

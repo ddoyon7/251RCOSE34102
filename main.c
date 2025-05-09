@@ -6,14 +6,19 @@ int main() {
 	Show_Process();
 	FCFS();
 	printf("\n\n");
+	Show_Process();
 	SJF();
 	printf("\n\n");
+	Show_Process();
 	Priority();
 	printf("\n\n");
+	Show_Process();
 	RR();
 	printf("\n\n");
+	Show_Process();
 	Preemptive_SJF();
 	printf("\n\n");
+	Show_Process();
 	Preemptive_Priority();
 	return 0;
 }
