@@ -21,14 +21,12 @@ process_info* Pop_Ready_Queue(int type) {
 	}
 	else {
 		process_info* res = ready_queue[0];
-		if (type == T_FCFS || type == T_SJF || type == T_PR || type == T_PSJF || type == T_PPR) {
-			ready_queue[0] = ready_queue[--rq_num];
+		rq_num--;
+		if (type == T_SJF || type == T_PR || type == T_PSJF || type == T_PPR) {
+			ready_queue[0] = ready_queue[rq_num];
 			Heapify_Down(0, type);
 		}
-		else if (type == T_RR) {
-			for (int i = 1; i < rq_num; i++) ready_queue[i - 1] = ready_queue[i];
-			rq_num--;
-		}
+		else if (type == T_FCFS || type == T_RR) for (int i = 1; i <= rq_num; i++) ready_queue[i - 1] = ready_queue[i];
 		return res;
 	}
 }
@@ -77,12 +75,6 @@ void Heapify_Down(int idx, int type) {
 	int target = idx;
 
 	switch (type) {
-	case T_FCFS:
-		if (left < rq_num && ready_queue[left]->arrival_time < ready_queue[target]->arrival_time)
-			target = left;
-		if (left < rq_num && ready_queue[right]->arrival_time < ready_queue[target]->arrival_time)
-			target = right;
-		break;
 
 	case T_SJF:
 	case T_PSJF:
