@@ -3,6 +3,7 @@
 #include "queue.h"
 
 #define GANTT_SIZE 500
+#define TIME_QUANTUM 5
 
 extern int scheduling_time;
 extern int scheduling_idx;
@@ -11,7 +12,7 @@ extern process_info scheduling_process_list[PROCESS_NUMBER];
 
 extern int gantt_chart[GANTT_SIZE];
 
-void Init(int);
+void Init();
 
 int Is_Finished();
 

@@ -9,5 +9,7 @@ int main() {
 	SJF();
 	printf("\n\n");
 	Priority();
+	printf("\n\n");
+	RR();
 	return 0;
 }
