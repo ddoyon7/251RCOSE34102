@@ -19,6 +19,8 @@ int Is_Finished();
 
 int Is_Arrived();
 
+int Is_IoRequested();
+
 void FCFS();
 
 void SJF();

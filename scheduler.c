@@ -16,6 +16,8 @@ void Init() {
 		scheduling_process_list[i].arrival_time = process_list[i].arrival_time;
 		scheduling_process_list[i].cpu_burst_time = process_list[i].cpu_burst_time;
 		scheduling_process_list[i].priority = process_list[i].priority;
+		scheduling_process_list[i].io_burst_time = process_list[i].io_burst_time;
+		for (int j = 0; j < IOREQUEST_NUMBER; j++) scheduling_process_list[i].io_request_time[j] = process_list[i].io_request_time[j];
 	}
 }
 
@@ -28,16 +30,35 @@ int Is_Arrived() {
 	return scheduling_process_list[scheduling_idx].arrival_time == scheduling_time;
 }
 
+int Is_IoRequested() {
+	for (int i = 0; i < IOREQUEST_NUMBER; i++) if (running_process->io_request_time[i] == scheduling_time) return 1;
+	return 0;
+}
+
 void FCFS() {
 	printf("< FCFS() start >\n");
 	Init();
 	while (!Is_Finished()) {
 		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_FCFS);
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) running_process = Pop_Ready_Queue(T_FCFS);
+		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Push_Waiting_Queue(running_process);
+			running_process = NULL;
+			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_FCFS);
+		}
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
 			(running_process->cpu_burst_time)--;
 			if (running_process->cpu_burst_time == 0) running_process = NULL;
+		}
+		if (!Is_Empty_Waiting_Queue()) { // 아이오 끝난 애랑 어라이벌은 겹치면 아이오 끝난 애부터 들어감
+			process_info* pptr = Get_Front_Waiting_Queue();
+			pptr->io_burst_time--;
+			if (pptr->io_burst_time == 0) {
+				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
+				Push_Ready_Queue(Pop_Waiting_Queue(), T_FCFS);
+				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+			}
 		}
 		scheduling_time++;
 	}
@@ -52,10 +73,24 @@ void SJF() {
 	while (!Is_Finished()) {
 		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_SJF);
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) running_process = Pop_Ready_Queue(T_SJF);
+		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Push_Waiting_Queue(running_process);
+			running_process = NULL;
+			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_SJF);
+		}
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
 			(running_process->cpu_burst_time)--;
 			if (running_process->cpu_burst_time == 0) running_process = NULL;
+		}
+		if (!Is_Empty_Waiting_Queue()) { // 아이오 끝난 애랑 어라이벌은 겹치면 아이오 끝난 애부터 들어감
+			process_info* pptr = Get_Front_Waiting_Queue();
+			pptr->io_burst_time--;
+			if (pptr->io_burst_time == 0) {
+				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
+				Push_Ready_Queue(Pop_Waiting_Queue(), T_SJF);
+				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+			}
 		}
 		scheduling_time++;
 	}
@@ -70,10 +105,24 @@ void Priority() {
 	while (!Is_Finished()) {
 		while (Is_Arrived()) Push_Ready_Queue(&scheduling_process_list[scheduling_idx++], T_PR);
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) running_process = Pop_Ready_Queue(T_PR);
+		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Push_Waiting_Queue(running_process);
+			running_process = NULL;
+			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_PR);
+		}
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
 			(running_process->cpu_burst_time)--;
 			if (running_process->cpu_burst_time == 0) running_process = NULL;
+		}
+		if (!Is_Empty_Waiting_Queue()) { // 아이오 끝난 애랑 어라이벌은 겹치면 아이오 끝난 애부터 들어감
+			process_info* pptr = Get_Front_Waiting_Queue();
+			pptr->io_burst_time--;
+			if (pptr->io_burst_time == 0) {
+				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
+				Push_Ready_Queue(Pop_Waiting_Queue(), T_PR);
+				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+			}
 		}
 		scheduling_time++;
 	}
@@ -92,6 +141,11 @@ void RR() {
 			running_process = Pop_Ready_Queue(T_RR);
 			time_count = TIME_QUANTUM;
 		}
+		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Push_Waiting_Queue(running_process);
+			running_process = NULL;
+			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_RR);
+		}
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
 			(running_process->cpu_burst_time)--;
@@ -99,6 +153,15 @@ void RR() {
 			if (time_count == 0 || running_process->cpu_burst_time == 0) {
 				if (running_process->cpu_burst_time != 0) Push_Ready_Queue(running_process, T_RR);
 				running_process = NULL;
+			}
+		}
+		if (!Is_Empty_Waiting_Queue()) { // 아이오 끝난 애랑 어라이벌은 겹치면 아이오 끝난 애부터 들어감
+			process_info* pptr = Get_Front_Waiting_Queue();
+			pptr->io_burst_time--;
+			if (pptr->io_burst_time == 0) {
+				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
+				Push_Ready_Queue(Pop_Waiting_Queue(), T_RR);
+				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
 			}
 		}
 		scheduling_time++;
@@ -120,10 +183,24 @@ void Preemptive_SJF() {
 				running_process = Pop_Ready_Queue(T_PSJF);
 			}
 		}
+		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Push_Waiting_Queue(running_process);
+			running_process = NULL;
+			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_PSJF);
+		}
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
 			(running_process->cpu_burst_time)--;
 			if (running_process->cpu_burst_time == 0) running_process = NULL;
+		}
+		if (!Is_Empty_Waiting_Queue()) { // 아이오 끝난 애랑 어라이벌은 겹치면 아이오 끝난 애부터 들어감
+			process_info* pptr = Get_Front_Waiting_Queue();
+			pptr->io_burst_time--;
+			if (pptr->io_burst_time == 0) {
+				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
+				Push_Ready_Queue(Pop_Waiting_Queue(), T_PSJF);
+				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+			}
 		}
 		scheduling_time++;
 	}
@@ -144,10 +221,24 @@ void Preemptive_Priority() {
 				running_process = Pop_Ready_Queue(T_PPR);
 			}
 		}
+		while (running_process && Is_IoRequested()) { // 아이오 리퀘스트가 연쇄적으로 나올 수 있음 스왑 되자마자 바로 아이오리퀘스트가 나올수있음
+			Push_Waiting_Queue(running_process);
+			running_process = NULL;
+			if (!Is_Empty_Ready_Queue()) running_process = Pop_Ready_Queue(T_PPR);
+		}
 		if (running_process) {
 			gantt_chart[scheduling_time] = running_process->pid;
 			(running_process->cpu_burst_time)--;
 			if (running_process->cpu_burst_time == 0) running_process = NULL;
+		}
+		if (!Is_Empty_Waiting_Queue()) { // 아이오 끝난 애랑 어라이벌은 겹치면 아이오 끝난 애부터 들어감
+			process_info* pptr = Get_Front_Waiting_Queue();
+			pptr->io_burst_time--;
+			if (pptr->io_burst_time == 0) {
+				pptr->io_burst_time = process_list[Get_Process_Idx(pptr->pid)].io_burst_time;
+				Push_Ready_Queue(Pop_Waiting_Queue(), T_PPR);
+				printf("process %d : io finished at %d\n", pptr->pid, scheduling_time + 1);
+			}
 		}
 		scheduling_time++;
 	}
