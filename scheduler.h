@@ -11,12 +11,12 @@ typedef struct log {
 	char text[30];
 }log;
 
+enum log_type { ARRIVED, PREEMPTED, IO_REQUESTED, IO_FINISHED };
 
 extern int scheduling_time;
 extern int scheduling_idx;
 extern process_info* running_process;
 extern process_info scheduling_process_list[PROCESS_NUMBER];
-extern double evaluation_list[6][2];
 extern log log_list[100];
 extern int log_num;
 extern int gantt_chart[GANTT_SIZE];
