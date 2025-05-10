@@ -366,10 +366,35 @@ void Compute_Time(int end_time, int type) {
 
 void Evaluation() {
 	printf("< Evaluation >\n");
+	double mwt = MAX_CPUBURSTTIME * PROCESS_NUMBER, Mwt = 0; int mwtidx = 0, Mwtidx = 0;
+	double mtt = MAX_CPUBURSTTIME * PROCESS_NUMBER, Mtt = 0; int mttidx = 0, Mttidx = 0;
 	char scheduling_name[6][20] = { "FCFS","SJF","Priority","RoundRobin", "Preemptive SJF", "Preemptive Priority" };
 	for (int i = 0; i < 6; i++) {
 		printf("%20s | ", scheduling_name[i]);
-		if (evaluation_list[i][1] != 0) printf("average waitingtime : %5.2lf, average turnaroundtime : %5.2lf\n", evaluation_list[i][0], evaluation_list[i][1]);
+		if (evaluation_list[i][1]) {
+			printf("average waitingtime : %5.2lf, average turnaroundtime : %5.2lf\n", evaluation_list[i][0], evaluation_list[i][1]);
+			if (evaluation_list[i][0] < mwt) {
+				mwtidx = i;
+				mwt = evaluation_list[i][0];
+			}
+			if (evaluation_list[i][1] < mtt) {
+				mttidx = i;
+				mtt = evaluation_list[i][1];
+			}
+			if (evaluation_list[i][0] > Mwt) {
+				Mwtidx = i;
+				Mwt = evaluation_list[i][0];
+			}
+			if (evaluation_list[i][1] > Mtt) {
+				Mttidx = i;
+				Mtt = evaluation_list[i][1];
+			}
+		}
 		else printf("Not scheduled\n");
 	}
+	printf("\n");
+	if (evaluation_list[mwtidx][1]) printf("   Minimum average waiting time scheduling : %s\n", scheduling_name[mwtidx]);
+	if (evaluation_list[mttidx][1]) printf("Minimum average turnaround time scheduling : %s\n", scheduling_name[mttidx]);
+	if (evaluation_list[Mwtidx][1]) printf("   Maximum average waiting time scheduling : %s\n", scheduling_name[Mwtidx]);
+	if (evaluation_list[Mttidx][1]) printf("Maximum average turnaround time scheduling : %s\n", scheduling_name[Mttidx]);
 }
