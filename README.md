@@ -40,5 +40,7 @@ Each algorithm simulates context switches, waiting times, and process execution 
 To build the simulator, run:
 
 ```bash
+git clone https://github.com/ddoyon7/251RCOSE34102.git
+cd 251RCOSE34102
 make
 ./simulator
