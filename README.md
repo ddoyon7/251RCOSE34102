@@ -35,9 +35,9 @@ The simulator supports the following scheduling algorithms:
 
 Each algorithm simulates context switches, waiting times, and process execution order.
 
-## Build, Run Instructions
+## Build & Run Instructions
 
-To build the simulator, run:
+To build and run the simulator, run:
 
 ```bash
 git clone https://github.com/ddoyon7/251RCOSE34102.git
