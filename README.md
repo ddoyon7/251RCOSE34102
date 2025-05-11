@@ -33,7 +33,7 @@ The simulator supports the following scheduling algorithms:
 |                 | Preemptive Priority Scheduling  |
 | Time-sliced     | Round-Robin                     |
 
-Each algorithm simulates context switches, waiting times, and process execution order.
+Each algorithm simulates context switches, waiting times, turnaround times and process execution order.
 
 ## Build & Run Instructions
 
