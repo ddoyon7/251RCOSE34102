@@ -28,7 +28,7 @@ void Push_Ready_Queue(process_info* pi, int type) {
 	if (Is_Full_Ready_Queue()) printf("ERR_QUEUE IS FULL\n");
 	else {
 		ready_queue[rq_rear] = pi;
-		if (type == T_SJF || type == T_PR || type == T_PSJF || type == T_PPR) Heapify_Up(rq_rear, type);
+		if (type == T_SJF || type == T_PR || type == T_PSJF || type == T_PPR || type == T_RM || type == T_EDF) Heapify_Up(rq_rear, type);
 		rq_rear++;
 	}
 }
@@ -46,7 +46,7 @@ process_info* Pop_Ready_Queue(int type) {
 	else {
 		process_info* res = ready_queue[0];
 		rq_rear--;
-		if (type == T_SJF || type == T_PR || type == T_PSJF || type == T_PPR) {
+		if (type == T_SJF || type == T_PR || type == T_PSJF || type == T_PPR || type == T_RM || type == T_EDF) {
 			ready_queue[0] = ready_queue[rq_rear];
 			Heapify_Down(0, type);
 		}
@@ -96,6 +96,14 @@ void Heapify_Up(int idx, int type) {
 	case T_PR:
 	case T_PPR:
 		if (ready_queue[parent]->priority > ready_queue[idx]->priority) {
+			Swap_ReadyQueue(parent, idx);
+			Heapify_Up(parent, type);
+		}
+		break;
+
+	case T_RM:
+	case T_EDF:
+		if (ready_queue[parent]->period > ready_queue[idx]->period) {
 			Swap_ReadyQueue(parent, idx);
 			Heapify_Up(parent, type);
 		}

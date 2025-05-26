@@ -5,7 +5,7 @@
 #define QUEUE_SIZE 100
 
 #define SCHEDULE_TYPE_NUMBER 6
-
+#define REAL_TIME_SCHEDULE_TYPE_NUMBER 2
 /*
 * ready_queue ( 선형 큐 / 우선순위 큐 ), waiting_queue ( 선형 큐 )
 */
@@ -18,7 +18,7 @@ extern int wq_front, wq_rear;
 /*
 * scheduling algorithm 타입
 */
-enum SCHEDULE_TYPE { T_FCFS, T_SJF, T_PR, T_RR, T_PSJF, T_PPR };
+enum SCHEDULE_TYPE { T_FCFS, T_SJF, T_PR, T_RR, T_PSJF, T_PPR, T_RM, T_EDF };
 
 /*
 * queue 초기 설정
