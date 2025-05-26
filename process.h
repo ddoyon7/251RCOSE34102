@@ -15,6 +15,7 @@
 #define MAX_IOBURSTTIME 5
 #define IOREQUEST_NUMBER 3
 #define MAX_IOREQUESTTIME 50
+#define MAX_PERIOD 5
 
 /*
 * process 구조체 ( pid, arrivaltime, cpu_burst_time, io_burst_time, io_request_time, priority )
@@ -26,6 +27,7 @@ typedef struct process_info {
 	int io_burst_time;
 	int io_request_time[IOREQUEST_NUMBER];
 	int priority; // priority가 낮을수록, 우선순위가 높다.
+	int period;
 } process_info;
 
 /*
