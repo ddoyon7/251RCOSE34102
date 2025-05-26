@@ -5,12 +5,19 @@ It demonstrates the behavior of multiple CPU scheduling algorithms through a com
 
 ## File Structure
 ├── main.c # Entry point, user interface
+
 ├── process.c # Process creation and management
+
 ├── queue.c # Queue operations (ready/waiting)
+
 ├── scheduler.c # Scheduler implementations
+
 ├── process.h # Process structure definition
+
 ├── queue.h # Queue structure and prototypes
+
 ├── scheduler.h # Scheduling algorithm prototypes
+
 ├── Makefile # Compilation instructions
 
 ## Scheduling Algorithms Implemented
