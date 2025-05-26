@@ -20,7 +20,7 @@ typedef struct log {
 /*
 * log 타입
 */
-enum log_type { ARRIVED, PREEMPTED, IO_REQUESTED, IO_FINISHED };
+enum log_type { ARRIVED, PREEMPTED, IO_REQUESTED, IO_FINISHED, PERIOD, DEADLINE_MISS };
 
 /*
 * log 리스트
@@ -42,7 +42,7 @@ extern process_info* running_process, * waiting_process;
 extern process_info scheduling_process_list[PROCESS_NUMBER];
 
 /*
-* scheduling 구성 함수 ( init, is_finished, is_arrived, is_iorequested, locate )
+* scheduling 구성 함수 ( init, is_finished, is_arrived, is_iorequested, locate, is_deadline_missed )
 */
 void Init();
 
@@ -58,6 +58,8 @@ void Locate_Running_To_Wait(int);
 
 void Locate_Wait_To_Ready(int);
 
+int Is_Deadline_Missed(int);
+
 /*
 * scheduling algorithm ( FCFS, SJF, Priority, RR, Preemptive_SJF, Preemptive_Priority )
 */
@@ -67,6 +69,14 @@ void Priority();
 void RR();
 void Preemptive_SJF();
 void Preemptive_Priority();
+void Rate_Monotonic();
+void EDF();
+
+/*
+* gcd, lcm 함수
+*/
+int gcd(int, int);
+int lcm(int, int);
 
 /*
 * gantt_chart 리스트 ( scheduling_time별 pid 저장 )

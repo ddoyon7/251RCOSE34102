@@ -16,6 +16,7 @@
 #define IOREQUEST_NUMBER 3
 #define MAX_IOREQUESTTIME 50
 #define MAX_PERIOD 5
+#define REALTIME_PROCESS_NUMBER 2
 
 /*
 * process ±¸Á¶Ã¼ ( pid, arrivaltime, cpu_burst_time, io_burst_time, io_request_time, priority )
