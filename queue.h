@@ -26,9 +26,9 @@ enum SCHEDULE_TYPE { T_FCFS, T_SJF, T_PR, T_RR, T_PSJF, T_PPR, T_RM, T_EDF };
 void Config();
 
 /*
-* ready_queue 함수 ( push, pop, is_empty, is_full, heapify, swap, front )
+* ready_queue 함수 ( push, pop, is_empty, is_full, heapify, swap, front, set )
 */
-void Push_Ready_Queue(process_info*, int);
+void Push_Ready_Queue(process_info*, int, int);
 
 process_info* Pop_Ready_Queue(int);
 
@@ -43,6 +43,8 @@ void Heapify_Up(int, int);
 void Heapify_Down(int, int);
 
 void Swap_ReadyQueue(int, int);
+
+int Set_ReadyQueue_Aging(int, int, int);
 
 /*
 * waiting_queue 함수 ( push, pop, is_empty, is_full, front )

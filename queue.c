@@ -24,10 +24,11 @@ void Config() {
 * FCFS, RR의 경우 선형 큐를 만들어 rq_rear에 삽입한다.
 * SJF, PR, PSJF, PPR의 경우 힙 구조의 큐를 만들어 rq_rear에 삽입한 후 , Heapify_Up을 한다.
 */
-void Push_Ready_Queue(process_info* pi, int type) {
+void Push_Ready_Queue(process_info* pi, int type, int time) {
 	if (Is_Full_Ready_Queue()) printf("ERR_QUEUE IS FULL\n");
 	else {
 		ready_queue[rq_rear] = pi;
+		ready_queue[rq_rear]->ready_time = time;
 		if (type == T_SJF || type == T_PR || type == T_PSJF || type == T_PPR || type == T_RM || type == T_EDF) Heapify_Up(rq_rear, type);
 		rq_rear++;
 	}
@@ -152,12 +153,29 @@ void Heapify_Down(int idx, int type) {
 }
 
 /*
-* Index를 기준으로 swap한다.
+* index를 기준으로 swap한다.
 */
 void Swap_ReadyQueue(int idx1, int idx2) {
 	process_info* temp = ready_queue[idx1];
 	ready_queue[idx1] = ready_queue[idx2];
 	ready_queue[idx2] = temp;
+}
+
+/*
+* ready_quue에 저장된 process 중, max_time을 초과하여 waiting한 process를 aging한다.
+* aging한 process의 pid를 반환한다.
+*/
+int Set_ReadyQueue_Aging(int time, int max_time, int type) {
+	for (int i = 0; i < rq_rear; i++) {
+		if (time - ready_queue[i]->ready_time >= max_time) {
+			int pid = ready_queue[i]->pid;
+			ready_queue[i]->priority--;
+			ready_queue[i]->ready_time = time;
+			Heapify_Up(i, type);
+			return pid;
+		}
+	}
+	return 0;
 }
 
 /*
@@ -175,7 +193,7 @@ void Push_Waiting_Queue(process_info* pi) {
 }
 
 /*
-* waiting_queue의 첫원소를 Pop한다.
+* waiting_queue의 첫 원소를 Pop한다.
 */
 process_info* Pop_Waiting_Queue() {
 	if (Is_Empty_Waiting_Queue()) {
