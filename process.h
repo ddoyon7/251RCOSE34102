@@ -5,7 +5,7 @@
 #include <time.h>
 
 /*
-* process 내 데이터 범위
+* process 데이터 범위
 */
 #define PROCESS_NUMBER 5
 #define MAX_PID 32768
@@ -29,6 +29,7 @@ typedef struct process_info {
 	int io_request_time[IOREQUEST_NUMBER];
 	int priority; // priority가 낮을수록, 우선순위가 높다.
 	int period;
+	int ready_time; // ready_queue에 들어간 시간
 } process_info;
 
 /*
