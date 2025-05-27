@@ -1,7 +1,7 @@
 ## CPU Scheduling Simulator
 
-This project is a **CPU Scheduling Simulator** developed as part of the **Operating Systems course(	COSE341 - 02 ) at Korea University**.     
-It demonstrates the behavior of multiple CPU scheduling algorithms through a command-line interface (CLI), designed for educational use and performance analysis.
+ This project is a **CPU Scheduling Simulator** developed as part of the **Operating Systems course(	COSE341 - 02 ) at Korea University**.     
+ It demonstrates the behavior of multiple CPU scheduling algorithms through a command-line interface (CLI), designed for educational use and performance analysis.
 
 ## File Structure
 ├── main.c # Entry point, user interface     
@@ -15,7 +15,7 @@ It demonstrates the behavior of multiple CPU scheduling algorithms through a com
 
 ## Scheduling Algorithms Implemented
 
-The simulator supports the following scheduling algorithms:
+ The simulator supports the following scheduling algorithms:
 
 | Type            | Algorithm                       |
 |-----------------|---------------------------------|
@@ -28,12 +28,12 @@ The simulator supports the following scheduling algorithms:
 | Real-time       | Rate-Monotonic                  |
 |                 | EDF (Earliest Deadline First)   |
 
-Each algorithm (FCFS, SJF, Priority, Preemptive SJF, Preemptive Priority, Round-Robin) simulates context switches, waiting times, turnaround times and process execution order.          
-The real-time scheduling algorithm (Rate-Monotonic, EDF) schedules only two processes, both of which arrive at time 0. It is assumed that there are no I/O requests. The output only indicates whether the scheduling was successful.
+ Each algorithm (FCFS, SJF, Priority, Preemptive SJF, Preemptive Priority, Round-Robin) simulates context switches, waiting times, turnaround times and process execution order.          
+ The real-time scheduling algorithm (Rate-Monotonic, EDF) schedules only two processes, both of which arrive at time 0. It is assumed that there are no I/O requests. The output only indicates whether the scheduling was successful.
 
 ## Build & Run Instructions
 
-To build and run the simulator, run:
+ To build and run the simulator, run:
 
 ```bash
 git clone https://github.com/ddoyon7/251RCOSE34102.git
