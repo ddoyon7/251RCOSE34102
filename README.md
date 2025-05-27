@@ -32,6 +32,8 @@ The simulator supports the following scheduling algorithms:
 | Preemptive      | Preemptive SJF                  |
 |                 | Preemptive Priority Scheduling  |
 | Time-sliced     | Round-Robin                     |
+| Real-time       | Rate-Monotonic                  |
+|                 | EDF (Earliest Deadline First)   |
 
 Each algorithm simulates context switches, waiting times, turnaround times and process execution order.
 
