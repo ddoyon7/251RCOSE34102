@@ -51,7 +51,12 @@ void Create_Process() {
 */
 void Show_Process() {
 	printf("--------------------------------------------------------< Created Processes >------------------------------------------------\n");
-	for (int i = 0; i < PROCESS_NUMBER; i++) printf("Process %5d | ArrivalTime : %2d, CpuBurstTime : %2d, Priority : %2d, IoBurstTime : %2d, IoRequestTime : %2d, %2d, %2d, Period : %2d\n", process_list[i].pid, process_list[i].arrival_time, process_list[i].cpu_burst_time, process_list[i].priority, process_list[i].io_burst_time, process_list[i].io_request_time[0], process_list[i].io_request_time[1], process_list[i].io_request_time[2], process_list[i].period);
+	for (int i = 0; i < PROCESS_NUMBER; i++) {
+		printf("Process %5d | ArrivalTime : %2d, CpuBurstTime : %2d, Priority : %2d, IoBurstTime : %2d, ", process_list[i].pid, process_list[i].arrival_time, process_list[i].cpu_burst_time, process_list[i].priority, process_list[i].io_burst_time);
+		printf("IoRequestTime : ");
+		for (int j = 0; j < IOREQUEST_NUMBER; j++) printf("%2d, ", process_list[i].io_request_time[j]);
+		printf("Period : %2d\n", process_list[i].period);
+	}
 	printf("-----------------------------------------------------------------------------------------------------------------------------\n");
 }
 
