@@ -1,6 +1,7 @@
 ## CPU Scheduling Simulator
 
-This project is a **CPU Scheduling Simulator** developed as part of the **Operating Systems course(	COSE341 - 02 ) at Korea University**.  
+This project is a **CPU Scheduling Simulator** developed as part of the **Operating Systems course(	COSE341 - 02 ) at Korea University**.
+
 It demonstrates the behavior of multiple CPU scheduling algorithms through a command-line interface (CLI), designed for educational use and performance analysis.
 
 ## File Structure
@@ -36,6 +37,7 @@ The simulator supports the following scheduling algorithms:
 |                 | EDF (Earliest Deadline First)   |
 
 Each algorithm (FCFS, SJF, Priority, Preemptive SJF, Preemptive Priority, Round-Robin) simulates context switches, waiting times, turnaround times and process execution order.
+
 The real-time scheduling algorithm (Rate-Monotonic, EDF) schedules only two processes, both of which arrive at time 0. It is assumed that there are no I/O requests. The output only indicates whether the scheduling was successful.
 
 ## Build & Run Instructions
