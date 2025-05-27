@@ -35,7 +35,8 @@ The simulator supports the following scheduling algorithms:
 | Real-time       | Rate-Monotonic                  |
 |                 | EDF (Earliest Deadline First)   |
 
-Each algorithm simulates context switches, waiting times, turnaround times and process execution order.
+Each algorithm (FCFS, SJF, Priority, Preemptive SJF, Preemptive Priority, Round-Robin) simulates context switches, waiting times, turnaround times and process execution order.
+The real-time scheduling algorithm (Rate-Monotonic, EDF) schedules only two processes, both of which arrive at time 0. It is assumed that there are no I/O requests. The output only indicates whether the scheduling was successful.
 
 ## Build & Run Instructions
 
