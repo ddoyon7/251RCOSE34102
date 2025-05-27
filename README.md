@@ -4,7 +4,7 @@
  It demonstrates the behavior of multiple CPU scheduling algorithms through a command-line interface (CLI), designed for educational use and performance analysis.
 
 ## File Structure
-251RCOSE34102
+251RCOSE34102 Project  
 ├── main.c # Entry point, user interface     
 ├── process.c # Process creation and management     
 ├── queue.c # Queue operations (ready/waiting)          
