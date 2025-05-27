@@ -33,6 +33,9 @@ void Add_Log(int pid, int time, int type) {
 	case DEADLINE_MISS:
 		sprintf(log_list[log_num].text, "(Process %d Deadline Miss) ", pid);
 		break;
+	case AGED:
+		sprintf(log_list[log_num].text, "(Process %d Aged) ", pid);
+		break;
 	}
 	log_list[log_num].time = time;
 	log_num++;
@@ -125,7 +128,7 @@ void Locate_Running_To_Wait(int type) {
 */
 void Locate_Wait_To_Ready(int type) {
 	waiting_process->io_burst_time = process_list[Get_Process_Idx(waiting_process->pid)].io_burst_time;
-	Push_Ready_Queue(Pop_Waiting_Queue(), type);
+	Push_Ready_Queue(Pop_Waiting_Queue(), type, scheduling_time);
 	Add_Log(waiting_process->pid, scheduling_time + 1, IO_FINISHED);
 }
 
@@ -144,7 +147,7 @@ void FCFS() {
 	while (!Is_Finished()) {
 		while (Is_Arrived()) { // Arrived process를 ready_queue에 push한다. 
 			Add_Log(scheduling_process_list[next_process_idx].pid, scheduling_time, ARRIVED);
-			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_FCFS);
+			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_FCFS, scheduling_time);
 		}
 
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) Locate_Ready_To_Running(T_FCFS); // running process가 없다면 ready queue에서 process를 가져온다.
@@ -182,7 +185,7 @@ void SJF() {
 	while (!Is_Finished()) {
 		while (Is_Arrived()) {
 			Add_Log(scheduling_process_list[next_process_idx].pid, scheduling_time, ARRIVED);
-			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_SJF);
+			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_SJF, scheduling_time);
 		}
 
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) Locate_Ready_To_Running(T_SJF);
@@ -217,10 +220,15 @@ void SJF() {
 void Priority() {
 	printf("< Priority() start >\n");
 	Init();
+	int aged_pid;
 	while (!Is_Finished()) {
 		while (Is_Arrived()) {
 			Add_Log(scheduling_process_list[next_process_idx].pid, scheduling_time, ARRIVED);
-			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_PR);
+			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_PR, scheduling_time);
+		}
+
+		while ((aged_pid = Set_ReadyQueue_Aging(scheduling_time, MAX_READY_TIME, T_PR))) {
+			Add_Log(aged_pid, scheduling_time, AGED);
 		}
 
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) Locate_Ready_To_Running(T_PR);
@@ -259,7 +267,7 @@ void RR() {
 	while (!Is_Finished()) {
 		while (Is_Arrived()) {
 			Add_Log(scheduling_process_list[next_process_idx].pid, scheduling_time, ARRIVED);
-			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_RR);
+			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_RR, scheduling_time);
 		}
 
 		if (!Is_Empty_Ready_Queue() && running_process == NULL) {
@@ -278,7 +286,7 @@ void RR() {
 			(running_process->cpu_burst_time)--;
 			time_count--;
 			if (time_count == 0 || running_process->cpu_burst_time == 0) { // TIME_QUANTUM 안에 작업이 끝나지 않으면 다시 ready_queue로 보낸다.
-				if (running_process->cpu_burst_time != 0) Push_Ready_Queue(running_process, T_RR);
+				if (running_process->cpu_burst_time != 0) Push_Ready_Queue(running_process, T_RR, scheduling_time);
 				running_process = NULL;
 			}
 		}
@@ -305,13 +313,13 @@ void Preemptive_SJF() {
 	while (!Is_Finished()) {
 		while (Is_Arrived()) {
 			Add_Log(scheduling_process_list[next_process_idx].pid, scheduling_time, ARRIVED);
-			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_PSJF);
+			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_PSJF, scheduling_time);
 		}
 
 		if (!Is_Empty_Ready_Queue()) {
 			if (running_process == NULL) Locate_Ready_To_Running(T_PSJF);
 			else if (running_process != NULL && Get_Front_Ready_Queue()->cpu_burst_time < running_process->cpu_burst_time) { // ready_queue 첫 번째 원소의 cpu_burst_time가 더 작으면 preemption한다.
-				Push_Ready_Queue(running_process, T_PSJF);
+				Push_Ready_Queue(running_process, T_PSJF, scheduling_time);
 				Locate_Ready_To_Running(T_PSJF);
 				Add_Log(running_process->pid, scheduling_time, PREEMPTED);
 			}
@@ -347,16 +355,21 @@ void Preemptive_SJF() {
 void Preemptive_Priority() {
 	printf("< Preemptive_Priority() start >\n");
 	Init();
+	int aged_pid;
 	while (!Is_Finished()) {
 		while (Is_Arrived()) {
 			Add_Log(scheduling_process_list[next_process_idx].pid, scheduling_time, ARRIVED);
-			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_PPR);
+			Push_Ready_Queue(&scheduling_process_list[next_process_idx++], T_PPR, scheduling_time);
+		}
+
+		while ((aged_pid = Set_ReadyQueue_Aging(scheduling_time, MAX_READY_TIME, T_PPR))) {
+			Add_Log(aged_pid, scheduling_time, AGED);
 		}
 
 		if (!Is_Empty_Ready_Queue()) {
 			if (running_process == NULL) Locate_Ready_To_Running(T_PPR);
 			else if (running_process != NULL && Get_Front_Ready_Queue()->priority < running_process->priority) { // ready_queue 첫 번째 원소의 priority가 더 작으면 preemption한다.
-				Push_Ready_Queue(running_process, T_PPR);
+				Push_Ready_Queue(running_process, T_PPR, scheduling_time);
 				Locate_Ready_To_Running(T_PPR);
 				Add_Log(running_process->pid, scheduling_time, PREEMPTED);
 			}
@@ -386,50 +399,59 @@ void Preemptive_Priority() {
 	Compute_Time(scheduling_time, T_PPR);
 }
 
+
 /*
-* Rate Monotonic
+* -----------------------------------------------------
+* realtime scheduling algorithm ( Rate_Monotonic, EDF )
+* -----------------------------------------------------
+*/
+
+/*
+* Rate_Monotonic
 */
 void Rate_Monotonic() {
 	printf("< Rate_Monotonic() start with two processes >\n");
 	Init();
 	int scheduling_res = 1;
-	int finish_time = lcm(scheduling_process_list[0].period, scheduling_process_list[1].period);
-	while (scheduling_time <= finish_time) {
-		for (int i = 0; i < REALTIME_PROCESS_NUMBER; i++) {
-			if (scheduling_time % scheduling_process_list[i].period == 0) {
-				if (scheduling_time == 0) Add_Log(scheduling_process_list[i].pid, scheduling_time, ARRIVED);
-				else {
-					Add_Log(scheduling_process_list[i].pid, scheduling_time, PERIOD);
-					if (Is_Deadline_Missed(i)) {
-						Add_Log(scheduling_process_list[i].pid, scheduling_time, DEADLINE_MISS);
-						scheduling_res = 0;
+	if (!Is_Finished()) { // 예외 처리
+		int finish_time = lcm(scheduling_process_list[0].period, scheduling_process_list[1].period);
+		while (scheduling_time <= finish_time) {
+			for (int i = 0; i < REALTIME_PROCESS_NUMBER; i++) {
+				if (scheduling_time % scheduling_process_list[i].period == 0) { // period
+					if (scheduling_time == 0) Add_Log(scheduling_process_list[i].pid, scheduling_time, ARRIVED);
+					else {
+						Add_Log(scheduling_process_list[i].pid, scheduling_time, PERIOD);
+						if (Is_Deadline_Missed(i)) { // deadline miss
+							Add_Log(scheduling_process_list[i].pid, scheduling_time, DEADLINE_MISS);
+							scheduling_res = 0;
+						}
 					}
+					Push_Ready_Queue(&scheduling_process_list[i], T_RM, scheduling_time);
 				}
-				Push_Ready_Queue(&scheduling_process_list[i], T_RM);
 			}
-		}
 
-		if (scheduling_time == finish_time || scheduling_res == 0) break;
+			if (scheduling_time == finish_time || scheduling_res == 0) break;
 
-		if (!Is_Empty_Ready_Queue()) {
-			if (running_process == NULL) Locate_Ready_To_Running(T_RM);
-			else if (running_process != NULL && Get_Front_Ready_Queue()->period < running_process->period) {
-				Push_Ready_Queue(running_process, T_RM);
-				Locate_Ready_To_Running(T_RM);
-				Add_Log(running_process->pid, scheduling_time, PREEMPTED);
+			if (!Is_Empty_Ready_Queue()) {
+				if (running_process == NULL) Locate_Ready_To_Running(T_RM);
+				else if (running_process != NULL && Get_Front_Ready_Queue()->period < running_process->period) {
+					Push_Ready_Queue(running_process, T_RM, scheduling_time);
+					Locate_Ready_To_Running(T_RM);
+					Add_Log(running_process->pid, scheduling_time, PREEMPTED);
+				}
 			}
-		}
 
-		if (running_process) {
-			gantt_chart[scheduling_time] = running_process->pid;
-			(running_process->cpu_burst_time)--;
-			if (running_process->cpu_burst_time == 0) {
-				running_process->cpu_burst_time = process_list[Get_Process_Idx(running_process->pid)].cpu_burst_time;
-				running_process = NULL;
+			if (running_process) {
+				gantt_chart[scheduling_time] = running_process->pid;
+				(running_process->cpu_burst_time)--;
+				if (running_process->cpu_burst_time == 0) {
+					running_process->cpu_burst_time = process_list[Get_Process_Idx(running_process->pid)].cpu_burst_time;
+					running_process = NULL;
+				}
 			}
-		}
 
-		scheduling_time++;
+			scheduling_time++;
+		}
 	}
 	Show_Gantt(scheduling_time);
 	printf("< Rate_Monotonic() end with two processes >\n\n");
@@ -444,44 +466,46 @@ void EDF() {
 	printf("< EDF() start with two processes >\n");
 	Init();
 	int scheduling_res = 1;
-	int finish_time = lcm(scheduling_process_list[0].period, scheduling_process_list[1].period);
-	while (scheduling_time <= finish_time) {
-		for (int i = 0; i < REALTIME_PROCESS_NUMBER; i++) {
-			if (scheduling_time % scheduling_process_list[i].period == 0) {
-				if (scheduling_time == 0) Add_Log(scheduling_process_list[i].pid, scheduling_time, ARRIVED);
-				else {
-					Add_Log(scheduling_process_list[i].pid, scheduling_time, PERIOD);
-					scheduling_process_list[i].period += process_list[i].period;
-					if (Is_Deadline_Missed(i)) {
-						Add_Log(scheduling_process_list[i].pid, scheduling_time, DEADLINE_MISS);
-						scheduling_res = 0;
+	if (!Is_Finished()) {
+		int finish_time = lcm(scheduling_process_list[0].period, scheduling_process_list[1].period);
+		while (scheduling_time <= finish_time) {
+			for (int i = 0; i < REALTIME_PROCESS_NUMBER; i++) {
+				if (scheduling_time % scheduling_process_list[i].period == 0) {
+					if (scheduling_time == 0) Add_Log(scheduling_process_list[i].pid, scheduling_time, ARRIVED);
+					else {
+						Add_Log(scheduling_process_list[i].pid, scheduling_time, PERIOD);
+						scheduling_process_list[i].period += process_list[i].period; // period 증가
+						if (Is_Deadline_Missed(i)) {
+							Add_Log(scheduling_process_list[i].pid, scheduling_time, DEADLINE_MISS);
+							scheduling_res = 0;
+						}
 					}
+					Push_Ready_Queue(&scheduling_process_list[i], T_EDF, scheduling_time);
 				}
-				Push_Ready_Queue(&scheduling_process_list[i], T_EDF);
 			}
-		}
 
-		if (scheduling_time == finish_time || scheduling_res == 0) break;
+			if (scheduling_time == finish_time || scheduling_res == 0) break;
 
-		if (!Is_Empty_Ready_Queue()) {
-			if (running_process == NULL) Locate_Ready_To_Running(T_EDF);
-			else if (running_process != NULL && Get_Front_Ready_Queue()->period < running_process->period) {
-				Push_Ready_Queue(running_process, T_EDF);
-				Locate_Ready_To_Running(T_EDF);
-				Add_Log(running_process->pid, scheduling_time, PREEMPTED);
+			if (!Is_Empty_Ready_Queue()) {
+				if (running_process == NULL) Locate_Ready_To_Running(T_EDF);
+				else if (running_process != NULL && Get_Front_Ready_Queue()->period < running_process->period) {
+					Push_Ready_Queue(running_process, T_EDF, scheduling_time);
+					Locate_Ready_To_Running(T_EDF);
+					Add_Log(running_process->pid, scheduling_time, PREEMPTED);
+				}
 			}
-		}
 
-		if (running_process) {
-			gantt_chart[scheduling_time] = running_process->pid;
-			(running_process->cpu_burst_time)--;
-			if (running_process->cpu_burst_time == 0) {
-				running_process->cpu_burst_time = process_list[Get_Process_Idx(running_process->pid)].cpu_burst_time;
-				running_process = NULL;
+			if (running_process) {
+				gantt_chart[scheduling_time] = running_process->pid;
+				(running_process->cpu_burst_time)--;
+				if (running_process->cpu_burst_time == 0) {
+					running_process->cpu_burst_time = process_list[Get_Process_Idx(running_process->pid)].cpu_burst_time;
+					running_process = NULL;
+				}
 			}
-		}
 
-		scheduling_time++;
+			scheduling_time++;
+		}
 	}
 	Show_Gantt(scheduling_time);
 	printf("< EDF() end with two processes >\n\n");

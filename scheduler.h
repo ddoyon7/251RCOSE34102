@@ -9,18 +9,22 @@
 
 #define TIME_QUANTUM 5
 
+#define MAX_READY_TIME 10
+
+#define BUFFER_SIZE 30
+
 /*
 * log 구조체 ( time, text )
 */
 typedef struct log {
 	int time;
-	char text[30];
+	char text[BUFFER_SIZE];
 }log;
 
 /*
 * log 타입
 */
-enum log_type { ARRIVED, PREEMPTED, IO_REQUESTED, IO_FINISHED, PERIOD, DEADLINE_MISS };
+enum log_type { ARRIVED, PREEMPTED, IO_REQUESTED, IO_FINISHED, PERIOD, DEADLINE_MISS, AGED };
 
 /*
 * log 리스트
@@ -69,6 +73,10 @@ void Priority();
 void RR();
 void Preemptive_SJF();
 void Preemptive_Priority();
+
+/*
+* realtime scheduling algorithm ( Rate_Monotonic, EDF )
+*/
 void Rate_Monotonic();
 void EDF();
 
